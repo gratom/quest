@@ -1,0 +1,15 @@
+using System;
+
+namespace Global.Managers
+{
+    public class #SCRIPTNAME# : BaseManager
+    {
+        public override Type ManagerType => typeof(#SCRIPTNAME#);
+
+        protected override bool OnInit()
+        {
+            //init your manager here and return "true", if all OK
+            return true;
+        }
+    }
+}
