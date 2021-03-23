@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8094170c317614440b058ef73f0723ca, type: 3}
   m_Name: BootSettings
   m_EditorClassIdentifier: 
-  bootTime: 0
+  bootTime: 0.5
   nextSceneIndex: 1
   managers:
   - {fileID: 7558119114006419584, guid: eef0424cf59d4df4f9f77a949cce1b1a, type: 3}
+  - {fileID: 6565596491243536648, guid: dbd4f793224472745b4204e8a501ac3c, type: 3}
