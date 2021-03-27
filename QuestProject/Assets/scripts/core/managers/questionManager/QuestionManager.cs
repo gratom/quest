@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +8,6 @@ namespace Global.Managers
 {
     using Global.Components;
     using Global.Managers.Datas;
-    using System.Linq;
 
     public class QuestionManager : BaseManager
     {

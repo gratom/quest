@@ -19,5 +19,21 @@ namespace Global.Components
         {
             this.id = id;
         }
+
+        public Question Copy()
+        {
+            Question returnedQuestion = new Question(id)
+            {
+                QuestionSubject = QuestionSubject,
+                CorrectAnswer = CorrectAnswer,
+                Difficult = Difficult,
+                Tags = new List<string>()
+            };
+            for (int i = 0; i < Tags.Count; i++)
+            {
+                returnedQuestion.Tags.Add(Tags[i]);
+            }
+            return returnedQuestion;
+        }
     }
 }
