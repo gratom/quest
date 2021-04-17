@@ -26,8 +26,8 @@ namespace Global.Managers
 
         [SerializeField] private InputField inputName;
         [SerializeField] private Text nameText;
-        [SerializeField] private Text questionText;
-        [SerializeField] private Text correctAnswerText;
+        [SerializeField] private InputField questionText;
+        [SerializeField] private InputField correctAnswerText;
         [SerializeField] private InputField gradeInput;
 
 #pragma warning restore
@@ -61,6 +61,12 @@ namespace Global.Managers
         {
             LoadQuestions();
             OpenUI();
+        }
+
+        public void ExitFromStartMenu()
+        {
+            CloseUI();
+            inputName.text = "";
         }
 
         public void FinishTesting()

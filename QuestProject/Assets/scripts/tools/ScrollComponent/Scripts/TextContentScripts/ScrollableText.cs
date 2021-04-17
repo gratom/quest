@@ -1,18 +1,34 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scrolling.Content
+namespace Tools.Components.Universal
 {
     [RequireComponent(typeof(Text))]
-    public class ScrollableText : ScrollableContainer
+    public class ScrollableText : BaseScrollableContainer
     {
         #region Inspector variables
 
 #pragma warning disable
+
         [HideInInspector, SerializeField] private Text text;
-#pragma warining restore
+
+#pragma warning restore
 
         #endregion Inspector variables
+
+        #region Public functions
+
+        public override void Init(IScrollableContainerContent content)
+        {
+            text.text = ((TextScrollableContainerContent)content).text;
+        }
+
+        public override void OnFirstInit()
+        {
+            //do nothing
+        }
+
+        #endregion Public functions
 
         #region Protected functions
 
@@ -25,14 +41,5 @@ namespace Scrolling.Content
         }
 
         #endregion Protected functions
-
-        #region Public functions
-
-        public override void Init(IScrollableContainerContent content)
-        {
-            text.text = ((A) content).s;
-        }
-
-        #endregion Public functions
     }
 }

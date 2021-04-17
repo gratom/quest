@@ -89,8 +89,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 0, y: 0}
 --- !u!114 &2899426744674105171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -103,10 +101,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638dcd9d20b358c489b99444d9a0fe09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnObject: {fileID: 5137631392107047559, guid: 7049e6a8126a3a3479fda2d0ab1cd183,
+  containerPrefab: {fileID: 5137631392107047559, guid: 7049e6a8126a3a3479fda2d0ab1cd183,
     type: 3}
-  spawnParent: {fileID: 2899426745817660691}
-  dragSensitivity: 100
+  scrollAreaTransform: {fileID: 2899426745817660691}
+  dragSensitivity: 1
+  mouseScrollSensitivity: 10000
+  isSlide: 0
+  decreasingImpulsePlot:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.9
+      inSlope: -0.016748264
+      outSlope: -0.016748264
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.29007635
+    - serializedVersion: 3
+      time: 3
+      value: 0
+      inSlope: -0.7328665
+      outSlope: -0.7328665
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.06297716
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &2899426745817660688
 GameObject:
   m_ObjectHideFlags: 0

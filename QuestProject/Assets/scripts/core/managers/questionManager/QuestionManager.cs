@@ -8,7 +8,10 @@ namespace Global.Managers
 {
     using Global.Components;
     using Global.Managers.Datas;
+    using Tools;
+    using Tools.Components.Universal;
 
+    [Assert]
     public class QuestionManager : BaseManager
     {
         public override Type ManagerType => typeof(QuestionManager);
@@ -21,6 +24,7 @@ namespace Global.Managers
         [SerializeField] private InputField inputAnswer;
         [SerializeField] private InputField inputTags;
         [SerializeField] private InputField inputDifficult;
+        [SerializeField] private ScrollableComponent scrollableComponent;
 
 #pragma warning restore
 
@@ -39,6 +43,8 @@ namespace Global.Managers
         public void OpenQuestions()
         {
             LoadQuestions();
+            SetContentInScrollable();
+
             OpenUI();
         }
 
@@ -59,6 +65,7 @@ namespace Global.Managers
             {
                 SelectQuestion(0);
             }
+            SetContentInScrollable();
         }
 
         public void AddNewQuestion()
@@ -66,6 +73,7 @@ namespace Global.Managers
             currentQuestion = new Question(tempQuestions.Max(x => x.ID) + 1);
             Clear();
             LoadInfoFromQuestion();
+            SetContentInScrollable();
         }
 
         public void DeleteCurrentQuestion()
@@ -73,6 +81,7 @@ namespace Global.Managers
             if (currentQuestion != null)
             {
                 tempQuestions.Remove(currentQuestion);
+                SetContentInScrollable();
             }
         }
 
@@ -86,6 +95,7 @@ namespace Global.Managers
             {
                 tempQuestions.Add(currentQuestion);
             }
+            SetContentInScrollable();
         }
 
         #endregion public functions
@@ -139,6 +149,17 @@ namespace Global.Managers
         private void LoadQuestions()
         {
             tempQuestions = Services.GetManager<DataManager>().DynamicData.questions;
+        }
+
+        private void SetContentInScrollable()
+        {
+            List<IScrollableContainerContent> content = new List<IScrollableContainerContent>();
+            for (int i = 0; i < tempQuestions.Count; i++)
+            {
+                int iTemp = i;
+                content.Add(new ButtonScrollableContainerContent() { text = tempQuestions[i].QuestionSubject, onClick = () => { SelectQuestion(iTemp); } });
+            }
+            scrollableComponent.SetContent(content);
         }
 
         #endregion private functions

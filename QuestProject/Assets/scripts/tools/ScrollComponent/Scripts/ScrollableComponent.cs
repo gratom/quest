@@ -3,62 +3,107 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Scrolling
+namespace Tools.Components.Universal
 {
-    public class ScrollableComponent : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPointerExitHandler, IEndDragHandler, IBeginDragHandler
+    /// <summary>
+    /// Interface for simplified use and encapsulation compliance
+    /// </summary>
+    public interface IScrollableComponent
+    {
+        void SetContent(List<IScrollableContainerContent> content);
+    }
+
+    public class ScrollableComponent : MonoBehaviour, IScrollableComponent, IDragHandler, IPointerEnterHandler, IPointerExitHandler, IEndDragHandler, IBeginDragHandler
     {
         #region Inspector variables
 
 #pragma warning disable
-        [SerializeField] private ScrollableContainer containerPrefab;
+        [SerializeField] private BaseScrollableContainer containerPrefab;
         [SerializeField] private RectTransform scrollAreaTransform;
         [SerializeField] private float dragSensitivity = 1;
         [SerializeField] private float mouseScrollSensitivity;
-        [SerializeField] private bool isSlide;
+        [SerializeField] private bool isSlide = false;
         [SerializeField] private AnimationCurve decreasingImpulsePlot;
-#pragma warining restore
+#pragma warning restore
 
         #endregion Inspector variables
-
-        #region Private variables
-
-        private ScrollableContainer[] scrollableContainers;
-        private IScrollableContainerContent[] content;
-        private float itemsOffset;
-        private int itemsCount;
 
         private float containerHeight => containerPrefab.RectTransform.rect.height;
         private float scrollAreaHeight => scrollAreaTransform.rect.height;
 
-        private Coroutine updateMouseScrollCoroutineInstance;
-        private Coroutine updateSlideCoroutineInstance;
+        #region Private variables
+
+        private BaseScrollableContainer[] scrollableContainers;
+        private IScrollableContainerContent[] content;
+
+        private float itemsOffset;
+        private int itemsCount;
 
         private bool isHover = false;
-        private bool isSliding = false;
 
+        #region sliding variables
+
+        private bool isSliding = false;
         private float scrollImpulse;
         private Tools.AverageFloat averageImpulse = new Tools.AverageFloat();
         private float timer;
         private float currentTime => Time.time - timer;
+        private float lastTimeUpdateContainers;
+
+        /// <summary>
+        /// If the user released the scroll area quickly, then it will slide.
+        /// If he held the pointer on it, then it will stop when the pointer is released.
+        /// 0.1 is the hold time of the area so that there is no slide
+        /// </summary>
+        private bool shouldStartSlide => Time.time - lastTimeUpdateContainers < 0.1f;
+
+        #endregion sliding variables
+
+        #region coroutines instances
+
+        private Coroutine updateMouseScrollCoroutineInstance;
+        private Coroutine updateSlideCoroutineInstance;
+
+        #endregion coroutines instances
 
         #endregion Private variables
 
         #region Unity functions
 
-        private void Awake()
+        private void OnDisable()
         {
-            Init();
+            StopMouseScrollUpdateCoroutine();
+            StopSlideUpdateCoroutine();
+        }
+
+        private void OnEnable()
+        {
+            StartSlideUpdateCorotine();
+            StartMouseScrollUpdateCorotine();
         }
 
         #endregion Unity functions
 
         #region Public functions
 
+        public void Init()
+        {
+            InitContainers();
+        }
+
+        /// <summary>
+        /// Set all content in scrollable area
+        /// </summary>
+        /// <param name="content">List of content</param>
         public void SetContent(List<IScrollableContainerContent> content)
         {
+            if (scrollableContainers == null)
+            {
+                Init();
+            }
             itemsOffset = 0;
             this.content = content.ToArray();
-            foreach (var container in scrollableContainers)
+            foreach (BaseScrollableContainer container in scrollableContainers)
             {
                 container.gameObject.SetActive(true);
             }
@@ -90,7 +135,7 @@ namespace Scrolling
         public void OnEndDrag(PointerEventData eventData)
         {
             isSliding = isSlide;
-            if (isSliding)
+            if (isSliding && shouldStartSlide)
             {
                 scrollImpulse = averageImpulse.average;
                 timer = Time.time;
@@ -111,18 +156,14 @@ namespace Scrolling
 
         #region Private functions
 
-        private void Init()
-        {
-            InitContainers();
-        }
-
         private void InitContainers()
         {
-            itemsCount = Mathf.FloorToInt(scrollAreaHeight / containerHeight) + 3;
-            scrollableContainers = new ScrollableContainer[itemsCount];
+            itemsCount = Mathf.FloorToInt(scrollAreaHeight / containerHeight) + 2;
+            scrollableContainers = new BaseScrollableContainer[itemsCount];
             for (int i = 0; i < itemsCount; i++)
             {
-                var container = Instantiate(containerPrefab, scrollAreaTransform);
+                BaseScrollableContainer container = Instantiate(containerPrefab, scrollAreaTransform);
+                container.OnFirstInit();
                 container.gameObject.SetActive(false);
                 scrollableContainers[i] = container;
             }
@@ -131,28 +172,42 @@ namespace Scrolling
         private void UpdateContainers()
         {
             ClampOffset();
-            var firstIndex = Mathf.FloorToInt(itemsOffset / containerPrefab.RectTransform.rect.height);
+            int firstIndex = Mathf.FloorToInt(itemsOffset / containerPrefab.RectTransform.rect.height);
+
             for (int i = 0; i < itemsCount; i++)
             {
-                scrollableContainers[i]
-                    .Init(content[Mathf.Clamp(i + firstIndex, 0, content.Length - 1)]);
+                if ((i + firstIndex) <= content.Length - 1 && i + firstIndex >= 0)
+                {
+                    scrollableContainers[i]
+                        .Init(content[Mathf.Clamp(i + firstIndex, 0, content.Length - 1)]);
 
-                scrollableContainers[i].RectTransform.anchoredPosition =
-                    new Vector2(0, scrollAreaTransform.rect.yMax - i * containerHeight + (itemsOffset % containerHeight));
+                    scrollableContainers[i].RectTransform.anchoredPosition =
+                        new Vector2(0, -(i * containerHeight) + (itemsOffset % containerHeight));
+                    scrollableContainers[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    scrollableContainers[i].gameObject.SetActive(false);
+                }
             }
+            lastTimeUpdateContainers = Time.time;
         }
 
         private void ClampOffset()
         {
-            var maxOffset = content.Length * containerHeight - scrollAreaHeight;
+            float maxOffset = content.Length * containerHeight - scrollAreaHeight;
+            maxOffset = Mathf.Clamp(maxOffset, 0, maxOffset);
             itemsOffset = Mathf.Clamp(itemsOffset, 0, maxOffset);
         }
 
         private void StartMouseScrollUpdateCorotine()
         {
-            if (updateMouseScrollCoroutineInstance == null)
+            if (gameObject.activeInHierarchy)
             {
-                updateMouseScrollCoroutineInstance = StartCoroutine(UpdateMouseScrollCoroutine());
+                if (updateMouseScrollCoroutineInstance == null)
+                {
+                    updateMouseScrollCoroutineInstance = StartCoroutine(UpdateMouseScrollCoroutine());
+                }
             }
         }
 
@@ -176,9 +231,12 @@ namespace Scrolling
 
         private void StartSlideUpdateCorotine()
         {
-            if (updateSlideCoroutineInstance == null)
+            if (gameObject.activeInHierarchy)
             {
-                updateSlideCoroutineInstance = StartCoroutine(UpdateSlidingCoroutine());
+                if (updateSlideCoroutineInstance == null)
+                {
+                    updateSlideCoroutineInstance = StartCoroutine(UpdateSlidingCoroutine());
+                }
             }
         }
 
