@@ -24,6 +24,7 @@ namespace Global.Managers
         [SerializeField] private InputField inputAnswer;
         [SerializeField] private InputField inputTags;
         [SerializeField] private InputField inputDifficult;
+        [SerializeField] private InputField inputFind;
         [SerializeField] private ScrollableComponent scrollableComponent;
 
 #pragma warning restore
@@ -91,11 +92,24 @@ namespace Global.Managers
             currentQuestion.CorrectAnswer = inputAnswer.text;
             int.TryParse(inputDifficult.text, out currentQuestion.Difficult);
             currentQuestion.Tags = inputTags.text.Split(',').ToList();
+            for (int i = 0; i < currentQuestion.Tags.Count; i++)
+            {
+                if (currentQuestion.Tags[i] == "")
+                {
+                    currentQuestion.Tags.RemoveAt(i);
+                    i--;
+                }
+            }
             if (!tempQuestions.Contains(currentQuestion))
             {
                 tempQuestions.Add(currentQuestion);
             }
             SetContentInScrollable();
+        }
+
+        public void OnFindEnter()
+        {
+            SetContentInScrollable(tempQuestions.Where(x => x.QuestionSubject.ToLower().IndexOf(inputFind.text.ToLower()) >= 0).ToList());
         }
 
         #endregion public functions
@@ -153,11 +167,16 @@ namespace Global.Managers
 
         private void SetContentInScrollable()
         {
+            SetContentInScrollable(tempQuestions);
+        }
+
+        private void SetContentInScrollable(List<Question> questions)
+        {
             List<IScrollableContainerContent> content = new List<IScrollableContainerContent>();
-            for (int i = 0; i < tempQuestions.Count; i++)
+            for (int i = 0; i < questions.Count; i++)
             {
                 int iTemp = i;
-                content.Add(new ButtonScrollableContainerContent() { text = tempQuestions[i].QuestionSubject, onClick = () => { SelectQuestion(iTemp); } });
+                content.Add(new ButtonScrollableContainerContent() { text = questions[i].QuestionSubject, onClick = () => { SelectQuestion(iTemp); } });
             }
             scrollableComponent.SetContent(content);
         }

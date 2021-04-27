@@ -10,7 +10,7 @@ namespace Tools.Components.Universal
     /// </summary>
     public interface IScrollableComponent
     {
-        void SetContent(List<IScrollableContainerContent> content);
+        void SetContent(List<IScrollableContainerContent> content, bool updatePosition);
     }
 
     public class ScrollableComponent : MonoBehaviour, IScrollableComponent, IDragHandler, IPointerEnterHandler, IPointerExitHandler, IEndDragHandler, IBeginDragHandler
@@ -95,13 +95,16 @@ namespace Tools.Components.Universal
         /// Set all content in scrollable area
         /// </summary>
         /// <param name="content">List of content</param>
-        public void SetContent(List<IScrollableContainerContent> content)
+        public void SetContent(List<IScrollableContainerContent> content, bool updatePosition = false)
         {
             if (scrollableContainers == null)
             {
                 Init();
             }
-            itemsOffset = 0;
+            if (updatePosition)
+            {
+                itemsOffset = 0;
+            }
             this.content = content.ToArray();
             foreach (BaseScrollableContainer container in scrollableContainers)
             {
