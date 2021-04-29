@@ -7,6 +7,7 @@ namespace Global.Managers
     using Global.Components;
     using Global.Components.Testing;
     using Global.Managers.Datas;
+    using System.Linq;
     using Tools;
     using Tools.Components.Universal;
     using UnityEngine.UI;
@@ -32,7 +33,7 @@ namespace Global.Managers
         [SerializeField] private InputField questionText;
         [SerializeField] private InputField correctAnswerText;
         [SerializeField] private InputField gradeInput;
-
+        [SerializeField] private InputField inputFind;
         [SerializeField] private ScrollableComponent questionsList;
 
         [SerializeField] private Text resultText;
@@ -74,7 +75,7 @@ namespace Global.Managers
             inputName.text = "";
             ClearProcessPanel();
             PreparePool();
-            UpdateQuestionsList();
+            SetContentInScrollable();
             StartPanel.SetActive(false);
             ProcessPanel.SetActive(true);
             FinishPanel.SetActive(false);
@@ -82,15 +83,15 @@ namespace Global.Managers
 
         public void StartTesting()
         {
-            Test test = Services.GetManager<DataManager>().DynamicData.testsResults[2];
-            float dif = 0;
-            for (int i = 0; i < test.answers.Count; i++)
-            {
-                dif += test.answers[i].question.Difficult;
-            }
+            //Test test = Services.GetManager<DataManager>().DynamicData.testsResults[2];
+            //float dif = 0;
+            //for (int i = 0; i < test.answers.Count; i++)
+            //{
+            //    dif += test.answers[i].question.Difficult;
+            //}
 
-            dif /= test.answers.Count;
-            Debug.Log(dif);
+            //dif /= test.answers.Count;
+            //Debug.Log(dif);
 
             LoadQuestions();
             OpenUI();
@@ -114,7 +115,7 @@ namespace Global.Managers
         public void LeftQuestion() //убрать вопрос из пула
         {
             questionPool.Remove(currentQuestion);
-            UpdateQuestionsList();
+            SetContentInScrollable();
             ClearProcessPanel();
         }
 
@@ -123,8 +124,19 @@ namespace Global.Managers
             currentTest.answers.Add(new Answer(currentQuestion, currentGrade));
             questionPool.Remove(currentQuestion);
             currentQuestion = null;
-            UpdateQuestionsList();
+            SetContentInScrollable();
             ClearProcessPanel();
+        }
+
+        public void OnFindEnter()
+        {
+            SetContentInScrollable(questionPool.Where(x => x.QuestionSubject.ToLower().IndexOf(inputFind.text.ToLower()) >= 0).ToList());
+        }
+
+        public void ResetContentScrollable()
+        {
+            SetContentInScrollable();
+            inputFind.text = "";
         }
 
         #endregion public functions
@@ -159,20 +171,25 @@ namespace Global.Managers
             gradeInput.text = "";
         }
 
-        private void UpdateQuestionsList()
+        private void SetContentInScrollable()
         {
-            List<IScrollableContainerContent> contents = new List<IScrollableContainerContent>();
-            for (int i = 0; i < questionPool.Count; i++)
-            {
-                int tempI = i;
-                contents.Add(new ButtonScrollableContainerContent() { text = questionPool[i].QuestionSubject, onClick = () => { ChooseQuestion(tempI); } });
-            }
-            questionsList.SetContent(contents);
+            SetContentInScrollable(questionPool);
         }
 
-        private void ChooseQuestion(int indexInPool)
+        private void SetContentInScrollable(List<Question> questions)
         {
-            currentQuestion = questionPool[indexInPool];
+            List<IScrollableContainerContent> content = new List<IScrollableContainerContent>();
+            for (int i = 0; i < questions.Count; i++)
+            {
+                int iTemp = i;
+                content.Add(new ButtonScrollableContainerContent() { text = questions[iTemp].QuestionSubject, onClick = () => { ChooseQuestion(questions[iTemp].ID); } });
+            }
+            questionsList.SetContent(content);
+        }
+
+        private void ChooseQuestion(int index)
+        {
+            currentQuestion = questionPool.FirstOrDefault(x => x.ID == index);
             questionText.text = currentQuestion.QuestionSubject;
             correctAnswerText.text = currentQuestion.CorrectAnswer;
         }

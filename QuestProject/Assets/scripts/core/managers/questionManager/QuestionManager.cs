@@ -176,7 +176,7 @@ namespace Global.Managers
             for (int i = 0; i < questions.Count; i++)
             {
                 int iTemp = i;
-                content.Add(new ButtonScrollableContainerContent() { text = questions[i].QuestionSubject, onClick = () => { SelectQuestion(iTemp); } });
+                content.Add(new ButtonScrollableContainerContent() { text = questions[iTemp].QuestionSubject, onClick = () => { SelectQuestion(questions[iTemp].ID); } });
             }
             scrollableComponent.SetContent(content);
         }

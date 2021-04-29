@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Tools.Components.Universal
 {
@@ -19,6 +20,7 @@ namespace Tools.Components.Universal
 
 #pragma warning disable
         [SerializeField] private BaseScrollableContainer containerPrefab;
+        [SerializeField] private Slider slider;
         [SerializeField] private RectTransform scrollAreaTransform;
         [SerializeField] private float dragSensitivity = 1;
         [SerializeField] private float mouseScrollSensitivity;
@@ -30,6 +32,7 @@ namespace Tools.Components.Universal
 
         private float containerHeight => containerPrefab.RectTransform.rect.height;
         private float scrollAreaHeight => scrollAreaTransform.rect.height;
+        private float maxOffset => (content?.Length * containerHeight - scrollAreaHeight >= 0 ? content?.Length * containerHeight - scrollAreaHeight : 0) ?? 0;
 
         #region Private variables
 
@@ -115,6 +118,15 @@ namespace Tools.Components.Universal
             StartSlideUpdateCorotine();
         }
 
+        public void UpdateOffset()
+        {
+            if (slider != null)
+            {
+                itemsOffset = Mathf.Lerp(0, maxOffset, slider.normalizedValue);
+                UpdateContainers();
+            }
+        }
+
         #endregion Public functions
 
         #region Events system functions
@@ -127,6 +139,7 @@ namespace Tools.Components.Universal
                 averageImpulse.AddNext(eventData.delta.y);
             }
             UpdateContainers();
+            UpdateSlider();
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -198,8 +211,6 @@ namespace Tools.Components.Universal
 
         private void ClampOffset()
         {
-            float maxOffset = content.Length * containerHeight - scrollAreaHeight;
-            maxOffset = Mathf.Clamp(maxOffset, 0, maxOffset);
             itemsOffset = Mathf.Clamp(itemsOffset, 0, maxOffset);
         }
 
@@ -270,6 +281,7 @@ namespace Tools.Components.Universal
                 {
                     isSliding = false;
                 }
+                UpdateSlider();
                 UpdateContainers();
             }
         }
@@ -287,8 +299,17 @@ namespace Tools.Components.Universal
                 if (Input.mouseScrollDelta.y != 0)
                 {
                     itemsOffset -= Input.mouseScrollDelta.y * mouseScrollSensitivity * Time.deltaTime;
+                    UpdateSlider();
                     UpdateContainers();
                 }
+            }
+        }
+
+        private void UpdateSlider()
+        {
+            if (slider != null)
+            {
+                slider.normalizedValue = itemsOffset / maxOffset;
             }
         }
 
