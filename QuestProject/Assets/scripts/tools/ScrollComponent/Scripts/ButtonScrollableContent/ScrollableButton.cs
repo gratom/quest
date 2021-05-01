@@ -10,8 +10,8 @@ namespace Tools.Components.Universal
     {
 #pragma warning disable
 
-        [HideInInspector, SerializeField] private Button button;
-        [HideInInspector, SerializeField] private Text buttonText;
+        [HideInInspector, SerializeField] protected Button button;
+        [HideInInspector, SerializeField] protected Text buttonText;
 
 #pragma warning restore
 

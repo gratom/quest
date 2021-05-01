@@ -19,6 +19,7 @@ namespace Global.Managers
 #pragma warning disable
 
         [SerializeField] private GameObject UIPanel;
+        [SerializeField] private GameObject TagsPanel;
         [SerializeField] private InputField inputID;
         [SerializeField] private InputField inputQuestion;
         [SerializeField] private InputField inputAnswer;
@@ -27,10 +28,13 @@ namespace Global.Managers
         [SerializeField] private InputField inputFind;
         [SerializeField] private ScrollableComponent scrollableComponent;
 
+        [SerializeField] private Color colorTagAdd;
+        [SerializeField] private Color colorTagRemove;
 #pragma warning restore
 
         private Question currentQuestion;
         private List<Question> tempQuestions;
+        private List<string> tags;
 
         protected override bool OnInit()
         {
@@ -52,6 +56,7 @@ namespace Global.Managers
         public void SaveAndClose()
         {
             Services.GetManager<DataManager>().DynamicData.questions = tempQuestions;
+            Services.GetManager<DataManager>().DynamicData.AllTags = tags;
             Clear();
             CloseUI();
         }
@@ -112,6 +117,16 @@ namespace Global.Managers
             SetContentInScrollable(tempQuestions.Where(x => x.QuestionSubject.ToLower().IndexOf(inputFind.text.ToLower()) >= 0).ToList());
         }
 
+        public void OpenTags()
+        {
+            TagsPanel.SetActive(true);
+        }
+
+        public void CloseTags()
+        {
+            TagsPanel.SetActive(false);
+        }
+
         #endregion public functions
 
         #region private functions
@@ -123,6 +138,7 @@ namespace Global.Managers
             inputAnswer.text = "";
             inputDifficult.text = "";
             inputTags.text = "";
+            TagsPanel.SetActive(false);
         }
 
         private void SelectQuestion(int ID)
@@ -153,16 +169,19 @@ namespace Global.Managers
         private void OpenUI()
         {
             UIPanel.SetActive(true);
+            TagsPanel.SetActive(false);
         }
 
         private void CloseUI()
         {
             UIPanel.SetActive(false);
+            TagsPanel.SetActive(false);
         }
 
         private void LoadQuestions()
         {
             tempQuestions = Services.GetManager<DataManager>().DynamicData.questions;
+            tags = Services.GetManager<DataManager>().DynamicData.AllTags;
         }
 
         private void SetContentInScrollable()
@@ -179,6 +198,7 @@ namespace Global.Managers
                 content.Add(new ButtonScrollableContainerContent() { text = questions[iTemp].QuestionSubject, onClick = () => { SelectQuestion(questions[iTemp].ID); } });
             }
             scrollableComponent.SetContent(content);
+            TagsPanel.SetActive(false);
         }
 
         #endregion private functions

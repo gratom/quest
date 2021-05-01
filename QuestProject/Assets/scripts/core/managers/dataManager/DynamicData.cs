@@ -11,6 +11,7 @@ namespace Global.Managers.Datas
     public class DynamicData
     {
 #pragma warning disable
+        [SerializeField] public List<string> AllTags = new List<string>();
         [SerializeField] public List<Question> questions = new List<Question>();
         [SerializeField] public List<Test> testsResults = new List<Test>();
 #pragma warning restore
