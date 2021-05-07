@@ -26,7 +26,9 @@ namespace Global.Managers
         [SerializeField] private InputField inputTags;
         [SerializeField] private InputField inputDifficult;
         [SerializeField] private InputField inputFind;
+        [SerializeField] private InputField inputNewTag;
         [SerializeField] private ScrollableComponent scrollableComponent;
+        [SerializeField] private ScrollableComponent scrollTags;
 
         [SerializeField] private Color colorTagAdd;
         [SerializeField] private Color colorTagRemove;
@@ -119,12 +121,36 @@ namespace Global.Managers
 
         public void OpenTags()
         {
+            SetTagsScrollable();
             TagsPanel.SetActive(true);
         }
 
         public void CloseTags()
         {
             TagsPanel.SetActive(false);
+        }
+
+        public void AddNewTag()
+        {
+            tags.Add(inputNewTag.text);
+            SetTagsScrollable();
+        }
+
+        public void AddOrRemoveTagToQuestion(string tagName)
+        {
+            if (currentQuestion != null)
+            {
+                if (currentQuestion.Tags.FirstOrDefault(x => x == tagName) != null)
+                {
+                    currentQuestion.Tags.Remove(tagName);
+                }
+                else
+                {
+                    currentQuestion.Tags.Add(tagName);
+                }
+                inputTags.text = "";
+                currentQuestion.Tags.ForEach((x) => { inputTags.text += x + ","; });
+            }
         }
 
         #endregion public functions
@@ -163,6 +189,7 @@ namespace Global.Managers
             inputQuestion.text = currentQuestion.QuestionSubject;
             inputAnswer.text = currentQuestion.CorrectAnswer;
             inputDifficult.text = currentQuestion.Difficult.ToString();
+            inputTags.text = "";
             currentQuestion.Tags.ForEach((x) => { inputTags.text += x + ","; });
         }
 
@@ -199,6 +226,49 @@ namespace Global.Managers
             }
             scrollableComponent.SetContent(content);
             TagsPanel.SetActive(false);
+        }
+
+        private void SetTagsScrollable()
+        {
+            if (currentQuestion != null)
+            {
+                List<IScrollableContainerContent> content = new List<IScrollableContainerContent>();
+                for (int i = 0; i < tags.Count; i++)
+                {
+                    int iTemp = i;
+                    ColoredButtonScrollableContainerContent item = null;
+                    Color colorForTextTemp;
+                    if (currentQuestion.Tags.FirstOrDefault(x => x == tags[iTemp]) != null)
+                    {
+                        colorForTextTemp = colorTagRemove;
+                    }
+                    else
+                    {
+                        colorForTextTemp = colorTagAdd;
+                    }
+                    item = new ColoredButtonScrollableContainerContent()
+                    {
+                        text = tags[iTemp],
+                        onClick = () =>
+                        {
+                            AddOrRemoveTagToQuestion(tags[iTemp]);
+                            if (item.colorForText == colorTagAdd)
+                            {
+                                item.colorForText = colorTagRemove;
+                            }
+                            else
+                            {
+                                item.colorForText = colorTagAdd;
+                            }
+                            scrollTags.UncommonUpdate();
+                        },
+                        colorForText = colorForTextTemp
+                    };
+                    content.Add(item);
+                }
+                scrollTags.SetContent(content);
+                TagsPanel.SetActive(false);
+            }
         }
 
         #endregion private functions

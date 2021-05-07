@@ -127,6 +127,11 @@ namespace Tools.Components.Universal
             }
         }
 
+        public void UncommonUpdate()
+        {
+            UpdateContainers();
+        }
+
         #endregion Public functions
 
         #region Events system functions

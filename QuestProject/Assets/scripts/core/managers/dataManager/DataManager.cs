@@ -42,6 +42,23 @@ namespace Global.Managers.Datas
         protected override bool OnInit()
         {
             LoadOrCreateData(ref dynamicData, staticData.DynamicDataLocation);
+
+            //HashSet<string> allTags = new HashSet<string>();
+            //for (int i = 0; i < dynamicData.questions.Count; i++)
+            //{
+            //    for (int j = 0; j < dynamicData.questions[i].Tags.Count; j++)
+            //    {
+            //        if (dynamicData.questions[i].Tags[j] == "программировние")
+            //        {
+            //            dynamicData.questions[i].Tags[j] = "программирование";
+            //        }
+            //        if (!allTags.Contains(dynamicData.questions[i].Tags[j]))
+            //        {
+            //            allTags.Add(dynamicData.questions[i].Tags[j]);
+            //        }
+            //    }
+            //}
+            //dynamicData.AllTags = allTags.ToList();
             return true;
         }
 

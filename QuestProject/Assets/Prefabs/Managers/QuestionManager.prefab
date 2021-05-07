@@ -684,8 +684,8 @@ RectTransform:
   m_Father: {fileID: 8048009113873209641}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -983,7 +983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638dcd9d20b358c489b99444d9a0fe09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  containerPrefab: {fileID: 2151184353288692310, guid: 4fb63981dc4b07e4baed0e813c9ffe0c,
+  containerPrefab: {fileID: 4460343694089779411, guid: 4fb63981dc4b07e4baed0e813c9ffe0c,
     type: 3}
   slider: {fileID: 6285581801029591231}
   scrollAreaTransform: {fileID: 2899426745538668547}
@@ -1373,8 +1373,8 @@ RectTransform:
   m_Father: {fileID: 6865031100986457952}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1730,7 +1730,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 638dcd9d20b358c489b99444d9a0fe09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  containerPrefab: {fileID: 2151184353288692310, guid: 4fb63981dc4b07e4baed0e813c9ffe0c,
+  containerPrefab: {fileID: 6182558435474502416, guid: 4f6a12a035218474ca17726c2e18ad3a,
     type: 3}
   slider: {fileID: 9049955684521095492}
   scrollAreaTransform: {fileID: 2592409426679575869}
@@ -2079,7 +2079,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1055399240192314204
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2272,9 +2272,11 @@ MonoBehaviour:
   inputTags: {fileID: 6565596492813465792}
   inputDifficult: {fileID: 6565596492858851985}
   inputFind: {fileID: 1401482758625784267}
+  inputNewTag: {fileID: 4393458539146064169}
   scrollableComponent: {fileID: 2899426744399438403}
-  colorTagAdd: {r: 0, g: 0, b: 0, a: 0}
-  colorTagRemove: {r: 0, g: 0, b: 0, a: 0}
+  scrollTags: {fileID: 2534799745744072574}
+  colorTagAdd: {r: 0.45882353, g: 1, b: 0.4745098, a: 1}
+  colorTagRemove: {r: 1, g: 0.38175684, b: 0.3066038, a: 1}
 --- !u!1 &6565596491244578063
 GameObject:
   m_ObjectHideFlags: 0
@@ -5270,7 +5272,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6565596491243536648}
-        m_MethodName: AddNewQuestion
+        m_MethodName: AddNewTag
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
