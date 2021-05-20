@@ -58,7 +58,7 @@ namespace Global.Managers
             }
         }
 
-        private const int maxRate = 10;
+        public const int maxRate = 10;
 
         protected override bool OnInit()
         {
@@ -147,19 +147,19 @@ namespace Global.Managers
         {
             if (currentTest.answers.Count > 0)
             {
-                float result = 0;
-                float allScore = 0;
+                float totalGradeSum = 0;
+                float maximumGradeSum = 0;
                 float averageDifficult = 0;
                 for (int i = 0; i < currentTest.answers.Count; i++)
                 {
-                    result += currentTest.answers[i].grade * currentTest.answers[i].question.Difficult;
-                    allScore += maxRate * currentTest.answers[i].question.Difficult;
+                    totalGradeSum += currentTest.answers[i].grade * currentTest.answers[i].question.Difficult;
+                    maximumGradeSum += maxRate * currentTest.answers[i].question.Difficult;
                     averageDifficult += currentTest.answers[i].question.Difficult;
                 }
                 averageDifficult /= currentTest.answers.Count;
-                result = result / allScore * averageDifficult;
+                totalGradeSum = totalGradeSum / maximumGradeSum * averageDifficult;
 
-                return Mathf.RoundToInt(result * 100).ToString() + "\n difficult = " + averageDifficult.ToString("0.00");
+                return Mathf.RoundToInt(totalGradeSum * 100).ToString() + "\n difficult = " + averageDifficult.ToString("0.00");
             }
             return "0";
         }

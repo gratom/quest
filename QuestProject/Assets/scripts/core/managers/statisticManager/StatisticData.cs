@@ -7,10 +7,19 @@ namespace Global.Components.Statistics
     [Serializable]
     public class StatisticData
     {
+        public enum PersonType
+        {
+            employee,
+            applicant
+        }
+
+        public PersonType type = PersonType.employee;
         public string name;
         public int salary;
-        public KnowledgeData total;
+        public KnowledgeData averageKnowledge;
         public List<KnowledgeData> knowledgesByTags;
+
+        public float knowledgeCost => salary / (float)(averageKnowledge?.totalGradeSum ?? 1);
 
         public Dictionary<string, KnowledgeData> KnowledgeDictionary => knowledgeDictionary ?? InitKnowledgeDictionary();
 
@@ -37,6 +46,6 @@ namespace Global.Components.Statistics
         public int totalGradeSum;
         public int maximumGradeSum;
         public float averageDifficult;
-        public int points => Mathf.RoundToInt(totalGradeSum / maximumGradeSum * averageDifficult * 100);
+        public int points => Mathf.RoundToInt(((float)totalGradeSum / maximumGradeSum) * averageDifficult * 100f);
     }
 }

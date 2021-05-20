@@ -17,6 +17,11 @@ namespace Global.Components.Menu
             Services.GetManager<QuestionManager>().OpenQuestions();
         }
 
+        public void OpenStatistic()
+        {
+            Services.GetManager<StatisticManager>().StartStatistic();
+        }
+
         #endregion public functions
     }
 }

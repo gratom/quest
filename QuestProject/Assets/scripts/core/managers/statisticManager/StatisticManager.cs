@@ -10,6 +10,7 @@ namespace Global.Managers
     using Tools;
 
     using Tools.Components.Universal;
+    using UnityEngine.UI;
 
     [Assert]
     public class StatisticManager : BaseManager
@@ -26,6 +27,18 @@ namespace Global.Managers
         [SerializeField] private ScrollableComponent personsList;
         [SerializeField] private ScrollableComponent testsList;
 
+        #region person
+
+        [SerializeField, Header("person panel data")] private InputField salaryInput;
+        [SerializeField] private Text nameText;
+        [SerializeField] private Text averageKnowledgeText;
+        [SerializeField] private Text knowledgeCostText;
+        [SerializeField] private Text totalGradeSumText;
+        [SerializeField] private Text averageDifficultText;
+        [SerializeField] private Diagram diagram;
+
+        #endregion person
+
 #pragma warning restore
 
         private List<StatisticData> statisticDatas;
@@ -35,6 +48,7 @@ namespace Global.Managers
 
         protected override bool OnInit()
         {
+            CloseUI();
             return true;
         }
 
@@ -44,7 +58,21 @@ namespace Global.Managers
         {
             LoadStatisticData();
             LoadTestData();
+            UpdateListPersons();
             OpenUI();
+        }
+
+        public void OnSalaryInput(string s)
+        {
+            if (s != "")
+            {
+                int.TryParse(s, out int salary);
+                if (selectedData != null)
+                {
+                    selectedData.salary = salary;
+                }
+            }
+            UpdateSelectedStatistic();
         }
 
         public void AddFromTest()
@@ -54,10 +82,19 @@ namespace Global.Managers
             for (int i = 0; i < testsData.Count; i++)
             {
                 int j = i;
-                content.Add(new ButtonScrollableContainerContent() { text = testsData[j].name, onClick = () => { NewStatisticFromTest(j); } });
+                content.Add(new ButtonScrollableContainerContent()
+                {
+                    text = testsData[j].name,
+                    onClick = () =>
+                    {
+                        NewStatisticFromTest(j);
+                        TestsSubPanel.SetActive(false);
+                        UpdateListPersons();
+                    }
+                });
             }
             testsList.SetContent(content, true);
-            //show panel with tests
+            TestsSubPanel.SetActive(true);
         }
 
         public void DeleteSelected()
@@ -99,14 +136,118 @@ namespace Global.Managers
 
         private void NewStatisticFromTest(int index)
         {
-            StatisticData data = new StatisticData()
+            StatisticData sData = new StatisticData() { name = testsData[index].name };
+            sData.averageKnowledge = new KnowledgeData() { tag = "all" };
+            sData.knowledgesByTags = new List<KnowledgeData>();
+
+            HashSet<string> allTags = new HashSet<string>();
+
+            #region add all tags
+
+            foreach (Answer item in testsData[index].answers)
             {
-            };
-            statisticDatas.Add(data);
+                foreach (string tag in item.question.Tags)
+                {
+                    if (!allTags.Contains(tag))
+                    {
+                        allTags.Add(tag);
+                    }
+                }
+            }
+
+            #endregion add all tags
+
+            #region create knowlegdes by tags
+
+            foreach (string tagItem in allTags)
+            {
+                sData.knowledgesByTags.Add(new KnowledgeData() { tag = tagItem });
+            }
+
+            #endregion create knowlegdes by tags
+
+            #region solve values for every knowledge
+
+            foreach (KnowledgeData knowledge in sData.knowledgesByTags)
+            {
+                int counter = 0;
+                foreach (Answer answer in testsData[index].answers)
+                {
+                    if (answer.question.HashTags.Contains(knowledge.tag))
+                    {
+                        counter++;
+                        knowledge.averageDifficult += answer.question.Difficult;
+                        knowledge.maximumGradeSum += answer.question.Difficult * TestingManager.maxRate;
+                        knowledge.totalGradeSum += answer.grade * answer.question.Difficult;
+                    }
+                }
+                knowledge.averageDifficult /= counter;
+            }
+
+            #endregion solve values for every knowledge
+
+            #region solve values for total knowledge
+
+            {
+                int counter = 0;
+                foreach (Answer answer in testsData[index].answers)
+                {
+                    counter++;
+                    sData.averageKnowledge.averageDifficult += answer.question.Difficult;
+                    sData.averageKnowledge.maximumGradeSum += answer.question.Difficult * TestingManager.maxRate;
+                    sData.averageKnowledge.totalGradeSum += answer.grade * answer.question.Difficult;
+                }
+                sData.averageKnowledge.averageDifficult /= counter;
+            }
+
+            #endregion solve values for total knowledge
+
+            statisticDatas.Add(sData);
         }
 
         private void UpdateListPersons()
         {
+            List<IScrollableContainerContent> content = new List<IScrollableContainerContent>();
+            for (int i = 0; i < statisticDatas.Count; i++)
+            {
+                int j = i;
+                content.Add(new ButtonScrollableContainerContent()
+                {
+                    text = statisticDatas[j].name,
+                    onClick = () =>
+                    {
+                        SelectStatistic(j);
+                    }
+                });
+            }
+            personsList.SetContent(content);
+        }
+
+        private void SelectStatistic(int index)
+        {
+            selectedData = statisticDatas[index];
+            UpdateSelectedStatistic();
+        }
+
+        private void UpdateSelectedStatistic()
+        {
+            if (selectedData != null)
+            {
+                salaryInput.text = selectedData.salary.ToString();
+                nameText.text = selectedData.name;
+                averageKnowledgeText.text = selectedData.averageKnowledge.points.ToString();
+                knowledgeCostText.text = selectedData.knowledgeCost.ToString("0.00") + "$";
+                totalGradeSumText.text = selectedData.averageKnowledge.totalGradeSum.ToString() + " / " + selectedData.averageKnowledge.maximumGradeSum.ToString();
+                averageDifficultText.text = selectedData.averageKnowledge.averageDifficult.ToString("0.00");
+
+                diagram.MaxHeight = 500;
+                List<DiagramData> diagramDatas = new List<DiagramData>();
+                foreach (KnowledgeData item in selectedData.knowledgesByTags)
+                {
+                    diagramDatas.Add(new DiagramData() { fieldValue = item.points, fieldName = item.tag });
+                }
+                diagram.SetDiagram(diagramDatas);
+            }
         }
 
         private void Save()

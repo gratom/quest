@@ -98,13 +98,13 @@ namespace Tools.Components.Universal
         /// Set all content in scrollable area
         /// </summary>
         /// <param name="content">List of content</param>
-        public void SetContent(List<IScrollableContainerContent> content, bool updatePosition = false)
+        public void SetContent(List<IScrollableContainerContent> content, bool setPosZero = false)
         {
             if (scrollableContainers == null)
             {
                 Init();
             }
-            if (updatePosition)
+            if (setPosZero)
             {
                 itemsOffset = 0;
             }
