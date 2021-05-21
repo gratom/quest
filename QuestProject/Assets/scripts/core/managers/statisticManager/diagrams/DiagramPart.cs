@@ -12,12 +12,18 @@ namespace Global.Components.Statistics
         public float Height
         {
             get => image.rectTransform.rect.height;
-            set => image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, value);
+            set
+            {
+                image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, value);
+                mainValue.text = ((int)value).ToString();
+            }
         }
 
 #pragma warning disable
+
         [SerializeField] private Image image;
         [SerializeField] private Text text;
+        [SerializeField] private Text mainValue;
 
 #pragma warning restore
     }

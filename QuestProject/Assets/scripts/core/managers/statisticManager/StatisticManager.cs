@@ -240,11 +240,18 @@ namespace Global.Managers
                 totalGradeSumText.text = selectedData.averageKnowledge.totalGradeSum.ToString() + " / " + selectedData.averageKnowledge.maximumGradeSum.ToString();
                 averageDifficultText.text = selectedData.averageKnowledge.averageDifficult.ToString("0.00");
 
-                diagram.MaxHeight = 500;
+                diagram.MaxHeight = 600;
                 List<DiagramData> diagramDatas = new List<DiagramData>();
-                foreach (KnowledgeData item in selectedData.knowledgesByTags)
+                foreach (string item in Services.GetManager<DataManager>().DynamicData.AllTags)
                 {
-                    diagramDatas.Add(new DiagramData() { fieldValue = item.points, fieldName = item.tag });
+                    if (selectedData.KnowledgeDictionary.ContainsKey(item))
+                    {
+                        diagramDatas.Add(new DiagramData() { fieldValue = selectedData.KnowledgeDictionary[item].points, fieldName = item });
+                    }
+                    else
+                    {
+                        diagramDatas.Add(new DiagramData() { fieldValue = 0, fieldName = item });
+                    }
                 }
                 diagram.SetDiagram(diagramDatas);
             }
