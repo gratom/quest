@@ -1,4 +1,5 @@
 ﻿using System;
+using Tools;
 using UnityEngine;
 
 namespace Global.Managers.Datas
@@ -72,7 +73,7 @@ namespace Global.Managers.Datas
 
         private static void LoadOrCreateData<T>(ref T value, string location) where T : new()
         {
-            string data = PlayerPrefs.GetString(location, "");
+            string data = SaverLoaderModule.LoadMyDataFromFile(location);
             if (data != "")
             {
                 value = JsonUtility.FromJson<T>(data);
@@ -85,7 +86,8 @@ namespace Global.Managers.Datas
 
         private static void SaveData<T>(T value, string location)
         {
-            PlayerPrefs.SetString(location, JsonUtility.ToJson(value));
+            SaverLoaderModule.SaveMyDataToFile(location, JsonUtility.ToJson(value));
+            //PlayerPrefs.SetString(location, JsonUtility.ToJson(value));
         }
 
         #endregion private functions
