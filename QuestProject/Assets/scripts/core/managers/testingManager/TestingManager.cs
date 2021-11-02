@@ -121,11 +121,14 @@ namespace Global.Managers
 
         public void SaveAnswer() //сохранить ответ
         {
-            currentTest.answers.Add(new Answer(currentQuestion, currentGrade));
-            questionPool.Remove(currentQuestion);
-            currentQuestion = null;
-            SetContentInScrollable();
-            ClearProcessPanel();
+            if (currentQuestion != null)
+            {
+                currentTest.answers.Add(new Answer(currentQuestion, currentGrade));
+                questionPool.Remove(currentQuestion);
+                currentQuestion = null;
+                SetContentInScrollable();
+                ClearProcessPanel();
+            }
         }
 
         public void OnFindEnter()
